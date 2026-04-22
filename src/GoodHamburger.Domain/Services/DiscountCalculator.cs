@@ -1,3 +1,5 @@
+namespace GoodHamburger.Domain.Entities;
+
 public static class DiscountCalculator
 {
     public static decimal Calculate(IReadOnlyList<MenuItem> items)

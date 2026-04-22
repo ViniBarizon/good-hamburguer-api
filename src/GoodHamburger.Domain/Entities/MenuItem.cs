@@ -1,3 +1,5 @@
+namespace GoodHamburger.Domain.Entities;
+
 public class MenuItem
 {
     public int Id { get; private set; }

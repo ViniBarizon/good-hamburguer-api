@@ -1,3 +1,5 @@
+namespace GoodHamburger.Domain.Entities;
+
 public class Order
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
