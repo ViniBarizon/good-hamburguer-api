@@ -1,10 +1,9 @@
-# 🍔 Good Hamburger — Order Management System
+# Good Hamburger — STgen technical challenge
 
-A REST API built with .NET 9 and ASP.NET Core for managing orders at Good Hamburger restaurant, with a Blazor WebAssembly frontend.
-
+API Rest com .NET 9 e ASP.NET Core e frontend em Blazor.
 ---
 
-## 📋 Table of Contents
+## Conteúdo
 
 - [Primeiros Passos](#getting-started)
 - [Estrutura do Projeto](#project-structure)
@@ -15,7 +14,7 @@ A REST API built with .NET 9 and ASP.NET Core for managing orders at Good Hambur
 
 ---
 
-## 🚀 Getting Started
+## Início
 
 ### Pré requisitos
 
@@ -59,7 +58,7 @@ dotnet test
 ---
 
 ## 📁 Estrutura do Projeto
-GoodHamburger/
+```GoodHamburguer/
 ├── src/
 │   ├── GoodHamburger.Domain/         # Entities, business rules, interfaces
 │   ├── GoodHamburger.Application/    # Use cases, DTOs, mappings
@@ -68,7 +67,7 @@ GoodHamburger/
 │   └── GoodHamburger.Web/            # Blazor frontend
 └── tests/
 └── GoodHamburger.Tests/          # xUnit tests
-
+```
 ---
 
 ## 🏛️ Decisões de Arquitetura
