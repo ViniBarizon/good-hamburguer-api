@@ -9,3 +9,7 @@ public record OrderDto(
     decimal DiscountAmount,
     decimal Total
 );
+
+public record CreateOrderRequest(IEnumerable<int> MenuItemIds);
+
+public record UpdateOrderRequest(IEnumerable<int> MenuItemIds);
