@@ -1,3 +1,5 @@
+namespace GoodHamburger.Domain.Common;
+
 public class Result
 {
     public bool IsSuccess { get; }
@@ -11,4 +13,18 @@ public class Result
 
     public static Result Success() => new(true, null);
     public static Result Failure(string error) => new(false, error);
+}
+
+public class Result<T> : Result
+{
+    public T? Value { get; }
+
+    protected Result(bool isSuccess, string? error, T? value)
+        : base(isSuccess, error)
+    {
+        Value = value;
+    }
+
+    public static Result<T> Success(T value) => new(true, null, value);
+    public new static Result<T> Failure(string error) => new(false, error, default);
 }
