@@ -9,3 +9,9 @@ public interface IOrderRepository
     Task UpdateAsync(Order order);
     Task DeleteAsync(Guid id);
 }
+
+public interface IMenuItemRepository
+{
+    Task<MenuItem?> GetByIdAsync(int id);
+    Task<IEnumerable<MenuItem>> GetAllAsync();
+}
