@@ -31,4 +31,9 @@ public class Order
         _items.Remove(item);
         return Result.Success();
     }
+
+    public void ClearItems()
+    {
+        _items.Clear();
+    }
 }

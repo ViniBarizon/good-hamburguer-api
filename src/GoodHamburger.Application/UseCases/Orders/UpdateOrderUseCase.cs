@@ -10,12 +10,12 @@ public class UpdateOrderUseCase(IOrderRepository orderRepo, IMenuItemRepository 
 {
     public async Task<Result<OrderDto>> ExecuteAsync(Guid id, UpdateOrderRequest request)
     {
-        var existing = await orderRepo.GetByIdAsync(id);
+        var order = await orderRepo.GetByIdAsync(id);
 
-        if (existing is null)
+        if (order is null)
             return Result<OrderDto>.Failure("Order not found.");
 
-        var updated = new Order();
+        order.ClearItems();
 
         foreach (var menuItemId in request.MenuItemIds)
         {
@@ -24,13 +24,13 @@ public class UpdateOrderUseCase(IOrderRepository orderRepo, IMenuItemRepository 
             if (menuItem is null)
                 return Result<OrderDto>.Failure($"Menu item with id {menuItemId} not found.");
 
-            var result = updated.AddItem(menuItem);
+            var result = order.AddItem(menuItem);
 
             if (result.IsFailure)
                 return Result<OrderDto>.Failure(result.Error!);
         }
 
-        await orderRepo.UpdateAsync(updated);
-        return Result<OrderDto>.Success(updated.ToDto());
+        await orderRepo.UpdateAsync(order);
+        return Result<OrderDto>.Success(order.ToDto());
     }
 }
