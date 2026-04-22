@@ -1,5 +1,6 @@
-namespace GoodHamburger.Domain.Entities;
+namespace GoodHamburger.Domain.Interfaces;
 
+using GoodHamburger.Domain.Entities;
 public interface IOrderRepository
 {
     Task<Order?> GetByIdAsync(Guid id);
