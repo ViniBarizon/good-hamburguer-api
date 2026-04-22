@@ -1,3 +1,5 @@
+using GoodHamburger.Domain.Enums;
+
 namespace GoodHamburger.Domain.Entities;
 
 public static class DiscountCalculator
