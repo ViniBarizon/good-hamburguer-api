@@ -4,54 +4,102 @@
 @inject ApiService Api
 @inject NavigationManager Nav
 
-<h3>Orders</h3>
-
-<button class="btn btn-primary mb-3" @onclick="NewOrder">New Order</button>
+<div class="page-header">
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <span style="font-size:2.5rem">🧾</span>
+            <div>
+                <h2>Orders</h2>
+                <p>Manage all restaurant orders.</p>
+            </div>
+        </div>
+        <button class="btn btn-burger" @onclick="NewOrder">
+            <i class="bi bi-plus-lg me-2"></i>New Order
+        </button>
+    </div>
+</div>
 
 @if (_orders is null)
 {
-    <p>Loading...</p>
+    <div class="loading-state">
+        <div class="fs-1">⏳</div>
+        <p>Loading orders...</p>
+    </div>
 }
 else if (!_orders.Any())
 {
-    <p>No orders found.</p>
+    <div class="empty-state">
+        <div class="empty-icon">🍽️</div>
+        <h5>No orders yet</h5>
+        <p>Click "New Order" to get started.</p>
+    </div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Items</th>
-                <th>Subtotal</th>
-                <th>Discount</th>
-                <th>Total</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var order in _orders)
-            {
-                <tr>
-                    <td>@order.Id.ToString()[..8]...</td>
-                    <td>@string.Join(", ", order.Items.Select(i => i.Name))</td>
-                    <td>R$ @order.Subtotal.ToString("F2")</td>
-                    <td>@((order.DiscountPercentage * 100).ToString("F0"))%</td>
-                    <td>R$ @order.Total.ToString("F2")</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning"
-                                @onclick="() => EditOrder(order.Id)">
-                            Edit
-                        </button>
-                        <button class="btn btn-sm btn-danger"
-                                @onclick="() => DeleteOrder(order.Id)">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table orders-table mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Items</th>
+                        <th>Subtotal</th>
+                        <th>Discount</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in _orders)
+                    {
+                        <tr>
+                            <td>
+                                <span class="text-muted" style="font-size:0.8rem; font-family:monospace">
+                                    @order.Id.ToString()[..8]...
+                                </span>
+                            </td>
+                            <td>
+                                @foreach (var item in order.Items)
+                                {
+                                    <span class="badge rounded-pill me-1 @GetBadgeClass(item.Type)">
+                                        @GetItemIcon(item.Type) @item.Name
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-muted">R$ @order.Subtotal.ToString("F2")</td>
+                            <td>
+                                @if (order.DiscountPercentage > 0)
+                                {
+                                    <span class="discount-badge">
+                                        🏷️ @((order.DiscountPercentage * 100).ToString("F0"))% off
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="no-discount">—</span>
+                                }
+                            </td>
+                            <td>
+                                <strong class="text-success">R$ @order.Total.ToString("F2")</strong>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-warning me-1"
+                                        @onclick="() => EditOrder(order.Id)"
+                                        title="Edit">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger"
+                                        @onclick="() => DeleteOrder(order.Id)"
+                                        title="Delete">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }
 
 @code {
@@ -68,4 +116,20 @@ else
         await Api.DeleteOrderAsync(id);
         _orders = await Api.GetOrdersAsync();
     }
+
+    private string GetBadgeClass(string type) => type switch
+    {
+        "Sandwich" => "badge-sandwich",
+        "Side"     => "badge-side",
+        "Drink"    => "badge-drink",
+        _          => "bg-secondary"
+    };
+
+    private string GetItemIcon(string type) => type switch
+    {
+        "Sandwich" => "🍔",
+        "Side"     => "🍟",
+        "Drink"    => "🥤",
+        _          => "🍽️"
+    };
 }

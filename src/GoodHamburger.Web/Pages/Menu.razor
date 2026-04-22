@@ -3,33 +3,69 @@
 @using GoodHamburger.Web.Services
 @inject ApiService Api
 
-<h3>Menu</h3>
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span style="font-size:2.5rem">📋</span>
+        <div>
+            <h2>Our Menu</h2>
+            <p>Fresh ingredients, great prices.</p>
+        </div>
+    </div>
+</div>
 
 @if (_items is null)
 {
-    <p>Loading...</p>
+    <div class="loading-state">
+        <div class="fs-1">⏳</div>
+        <p>Loading menu...</p>
+    </div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in _items)
-            {
-                <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Type</td>
-                    <td>R$ @item.Price.ToString("F2")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card menu-card h-100">
+                <div class="card-header">🍔 Sandwiches</div>
+                <div class="card-body">
+                    @foreach (var item in _items.Where(i => i.Type == "Sandwich"))
+                    {
+                        <div class="menu-item-row">
+                            <span class="menu-item-name">@item.Name</span>
+                            <span class="menu-item-price">R$ @item.Price.ToString("F2")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card menu-card h-100">
+                <div class="card-header">🍟 Sides</div>
+                <div class="card-body">
+                    @foreach (var item in _items.Where(i => i.Type == "Side"))
+                    {
+                        <div class="menu-item-row">
+                            <span class="menu-item-name">@item.Name</span>
+                            <span class="menu-item-price">R$ @item.Price.ToString("F2")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card menu-card h-100">
+                <div class="card-header">🥤 Drinks</div>
+                <div class="card-body">
+                    @foreach (var item in _items.Where(i => i.Type == "Drink"))
+                    {
+                        <div class="menu-item-row">
+                            <span class="menu-item-name">@item.Name</span>
+                            <span class="menu-item-price">R$ @item.Price.ToString("F2")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @code {

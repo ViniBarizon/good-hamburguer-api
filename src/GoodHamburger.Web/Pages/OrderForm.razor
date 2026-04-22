@@ -5,39 +5,112 @@
 @inject ApiService Api
 @inject NavigationManager Nav
 
-<h3>@(_isEdit ? "Edit Order" : "New Order")</h3>
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <span style="font-size:2.5rem">@(_isEdit ? "✏️" : "➕")</span>
+        <div>
+            <h2>@(_isEdit ? "Edit Order" : "New Order")</h2>
+            <p>@(_isEdit ? "Update the items in this order." : "Select one item per type to build your order.")</p>
+        </div>
+    </div>
+</div>
 
 @if (_menu is null)
 {
-    <p>Loading menu...</p>
+    <div class="loading-state">
+        <div class="fs-1">⏳</div>
+        <p>Loading menu...</p>
+    </div>
 }
 else
 {
-    <div class="mb-3">
-        <label class="form-label">Select items (one per type)</label>
-        @foreach (var item in _menu)
-        {
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox"
-                       id="item-@item.Id"
-                       checked="@_selected.Contains(item.Id)"
-                       @onchange="e => ToggleItem(item.Id, (bool)e.Value!)" />
-                <label class="form-check-label" for="item-@item.Id">
-                    @item.Name — R$ @item.Price.ToString("F2") (@item.Type)
-                </label>
-            </div>
-        }
+    <div class="row g-4">
+        <div class="col-md-4">
+            <h6 class="fw-bold mb-3">🍔 Sandwiches <span class="text-muted fw-normal">(pick one)</span></h6>
+            @foreach (var item in _menu.Where(i => i.Type == "Sandwich"))
+            {
+                <div class="item-checkbox-card @(_selected.Contains(item.Id) ? "selected" : "")"
+                     @onclick="() => ToggleItem(item.Id, item.Type)">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <input type="checkbox" class="form-check-input me-2"
+                                   checked="@_selected.Contains(item.Id)"
+                                   @onclick:stopPropagation="true"
+                                   @onchange="e => ToggleItem(item.Id, item.Type)" />
+                            <span class="menu-item-name">@item.Name</span>
+                        </div>
+                        <span class="item-price">R$ @item.Price.ToString("F2")</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <h6 class="fw-bold mb-3">🍟 Sides <span class="text-muted fw-normal">(pick one)</span></h6>
+            @foreach (var item in _menu.Where(i => i.Type == "Side"))
+            {
+                <div class="item-checkbox-card @(_selected.Contains(item.Id) ? "selected" : "")"
+                     @onclick="() => ToggleItem(item.Id, item.Type)">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <input type="checkbox" class="form-check-input me-2"
+                                   checked="@_selected.Contains(item.Id)"
+                                   @onclick:stopPropagation="true"
+                                   @onchange="e => ToggleItem(item.Id, item.Type)" />
+                            <span class="menu-item-name">@item.Name</span>
+                        </div>
+                        <span class="item-price">R$ @item.Price.ToString("F2")</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <h6 class="fw-bold mb-3">🥤 Drinks <span class="text-muted fw-normal">(pick one)</span></h6>
+            @foreach (var item in _menu.Where(i => i.Type == "Drink"))
+            {
+                <div class="item-checkbox-card @(_selected.Contains(item.Id) ? "selected" : "")"
+                     @onclick="() => ToggleItem(item.Id, item.Type)">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <input type="checkbox" class="form-check-input me-2"
+                                   checked="@_selected.Contains(item.Id)"
+                                   @onclick:stopPropagation="true"
+                                   @onchange="e => ToggleItem(item.Id, item.Type)" />
+                            <span class="menu-item-name">@item.Name</span>
+                        </div>
+                        <span class="item-price">R$ @item.Price.ToString("F2")</span>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
+
+    @if (_selected.Any())
+    {
+        <div class="card mt-4 p-3" style="border-left: 4px solid var(--burger-primary)">
+            <strong>🧾 @_selected.Count item(s) selected</strong>
+            <span class="text-muted ms-2" style="font-size:0.85rem">
+                @string.Join(", ", _menu.Where(i => _selected.Contains(i.Id)).Select(i => i.Name))
+            </span>
+        </div>
+    }
 
     @if (_errorMessage is not null)
     {
-        <div class="alert alert-danger">@_errorMessage</div>
+        <div class="alert alert-danger mt-3 rounded-3">
+            ⚠️ @_errorMessage
+        </div>
     }
 
-    <button class="btn btn-success" @onclick="Submit">
-        @(_isEdit ? "Update" : "Create")
-    </button>
-    <button class="btn btn-secondary ms-2" @onclick="Cancel">Cancel</button>
+    <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-burger" @onclick="Submit">
+            <i class="bi bi-check-lg me-2"></i>@(_isEdit ? "Update Order" : "Place Order")
+        </button>
+        <button class="btn btn-outline-secondary rounded-3" @onclick="Cancel">
+            Cancel
+        </button>
+    </div>
 }
 
 @code {
@@ -60,15 +133,33 @@ else
         }
     }
 
-    private void ToggleItem(int id, bool isChecked)
+    private void ToggleItem(int id, string type)
     {
-        if (isChecked) _selected.Add(id);
-        else _selected.Remove(id);
+        // Se já selecionado, desmarca
+        if (_selected.Contains(id))
+        {
+            _selected.Remove(id);
+            _errorMessage = null;
+            return;
+        }
+
+        // Remove qualquer outro item do mesmo tipo antes de adicionar
+        var sameType = _menu!.Where(i => i.Type == type && _selected.Contains(i.Id)).ToList();
+        foreach (var item in sameType)
+            _selected.Remove(item.Id);
+
+        _selected.Add(id);
         _errorMessage = null;
     }
 
     private async Task Submit()
     {
+        if (!_selected.Any())
+        {
+            _errorMessage = "Please select at least one item.";
+            return;
+        }
+
         var model = new CreateOrderModel { MenuItemIds = _selected.ToList() };
 
         var result = _isEdit
@@ -78,7 +169,7 @@ else
         if (result is not null)
             Nav.NavigateTo("/orders");
         else
-            _errorMessage = "Failed to save order. Check for duplicate item types.";
+            _errorMessage = "Failed to save order. Please try again.";
     }
 
     private void Cancel() => Nav.NavigateTo("/orders");
