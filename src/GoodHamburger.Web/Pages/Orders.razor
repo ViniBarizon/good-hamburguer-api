@@ -1,0 +1,71 @@
+@page "/orders"
+@using GoodHamburger.Web.Models
+@using GoodHamburger.Web.Services
+@inject ApiService Api
+@inject NavigationManager Nav
+
+<h3>Orders</h3>
+
+<button class="btn btn-primary mb-3" @onclick="NewOrder">New Order</button>
+
+@if (_orders is null)
+{
+    <p>Loading...</p>
+}
+else if (!_orders.Any())
+{
+    <p>No orders found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Items</th>
+                <th>Subtotal</th>
+                <th>Discount</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in _orders)
+            {
+                <tr>
+                    <td>@order.Id.ToString()[..8]...</td>
+                    <td>@string.Join(", ", order.Items.Select(i => i.Name))</td>
+                    <td>R$ @order.Subtotal.ToString("F2")</td>
+                    <td>@((order.DiscountPercentage * 100).ToString("F0"))%</td>
+                    <td>R$ @order.Total.ToString("F2")</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning"
+                                @onclick="() => EditOrder(order.Id)">
+                            Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger"
+                                @onclick="() => DeleteOrder(order.Id)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<OrderModel>? _orders;
+
+    protected override async Task OnInitializedAsync() =>
+        _orders = await Api.GetOrdersAsync();
+
+    private void NewOrder() => Nav.NavigateTo("/orders/new");
+    private void EditOrder(Guid id) => Nav.NavigateTo($"/orders/edit/{id}");
+
+    private async Task DeleteOrder(Guid id)
+    {
+        await Api.DeleteOrderAsync(id);
+        _orders = await Api.GetOrdersAsync();
+    }
+}

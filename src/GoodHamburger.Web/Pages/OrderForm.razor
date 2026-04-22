@@ -1,0 +1,85 @@
+@page "/orders/new"
+@page "/orders/edit/{Id:guid}"
+@using GoodHamburger.Web.Models
+@using GoodHamburger.Web.Services
+@inject ApiService Api
+@inject NavigationManager Nav
+
+<h3>@(_isEdit ? "Edit Order" : "New Order")</h3>
+
+@if (_menu is null)
+{
+    <p>Loading menu...</p>
+}
+else
+{
+    <div class="mb-3">
+        <label class="form-label">Select items (one per type)</label>
+        @foreach (var item in _menu)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       id="item-@item.Id"
+                       checked="@_selected.Contains(item.Id)"
+                       @onchange="e => ToggleItem(item.Id, (bool)e.Value!)" />
+                <label class="form-check-label" for="item-@item.Id">
+                    @item.Name — R$ @item.Price.ToString("F2") (@item.Type)
+                </label>
+            </div>
+        }
+    </div>
+
+    @if (_errorMessage is not null)
+    {
+        <div class="alert alert-danger">@_errorMessage</div>
+    }
+
+    <button class="btn btn-success" @onclick="Submit">
+        @(_isEdit ? "Update" : "Create")
+    </button>
+    <button class="btn btn-secondary ms-2" @onclick="Cancel">Cancel</button>
+}
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private List<MenuItemModel>? _menu;
+    private HashSet<int> _selected = new();
+    private string? _errorMessage;
+    private bool _isEdit => Id.HasValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _menu = await Api.GetMenuAsync();
+
+        if (_isEdit)
+        {
+            var order = await Api.GetOrderAsync(Id!.Value);
+            if (order is not null)
+                _selected = order.Items.Select(i => i.Id).ToHashSet();
+        }
+    }
+
+    private void ToggleItem(int id, bool isChecked)
+    {
+        if (isChecked) _selected.Add(id);
+        else _selected.Remove(id);
+        _errorMessage = null;
+    }
+
+    private async Task Submit()
+    {
+        var model = new CreateOrderModel { MenuItemIds = _selected.ToList() };
+
+        var result = _isEdit
+            ? await Api.UpdateOrderAsync(Id!.Value, model)
+            : await Api.CreateOrderAsync(model);
+
+        if (result is not null)
+            Nav.NavigateTo("/orders");
+        else
+            _errorMessage = "Failed to save order. Check for duplicate item types.";
+    }
+
+    private void Cancel() => Nav.NavigateTo("/orders");
+}
