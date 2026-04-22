@@ -8,14 +8,12 @@ namespace GoodHamburger.Infrastructure.Repositories;
 public class OrderRepository(AppDbContext db) : IOrderRepository
 {
     public async Task<Order?> GetByIdAsync(Guid id) =>
-        await db.Orders
-                .Include("_items")
-                .FirstOrDefaultAsync(o => o.Id == id);
+    await db.Orders
+            .FirstOrDefaultAsync(o => o.Id == id);
 
     public async Task<IEnumerable<Order>> GetAllAsync() =>
-        await db.Orders
-                .Include("_items")
-                .ToListAsync();
+    await db.Orders
+            .ToListAsync();
 
     public async Task AddAsync(Order order)
     {

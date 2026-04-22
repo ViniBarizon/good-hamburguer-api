@@ -13,10 +13,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             order.HasKey(o => o.Id);
 
-            order.Navigation(o => o.Items)
-                 .HasField("_items")
-                 .UsePropertyAccessMode(PropertyAccessMode.Field);
-
             order.OwnsMany(o => o.Items, items =>
             {
                 items.WithOwner();
