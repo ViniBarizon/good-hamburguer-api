@@ -96,7 +96,7 @@ public Result AddItem(MenuItem item)
 }
 ```
 
-### Use Cases Instead of Fat Services
+### Arquivos para cada Use Case
 
 Talvez uma decisão controversa. aqui cada use case tem seu próprio arquivo, evitando arquivos gigantes.
 
@@ -108,13 +108,13 @@ O arquivo do banco é criado automaticamente no primeiro startup via EF Core mig
 
 Os itens do menu são fixos por especificação e não precisam ser persistidos.
 
-### Blazor WebAssembly Frontend
+### Blazor Frontend
 
 Apesar de não ter experiência prévia com o Blazor, decidi arriscar e implementar e me diverti bastante. Me lembrou muito como o Blade do Laravel funciona, o que me trouxe certa familiaridade. Aqui, temos um backend e um frontend desacoplados, se comunicando com nossa API através de chamadas HTTP.
 
 ---
 
-## ❌ What Was Left Out & Why
+## ❌ O que ficou de fora
 
 ### Authentication & Authorization
 
