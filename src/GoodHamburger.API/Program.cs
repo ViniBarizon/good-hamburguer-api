@@ -20,6 +20,14 @@ builder.Services.AddScoped<GetOrderUseCase>();
 builder.Services.AddScoped<UpdateOrderUseCase>();
 builder.Services.AddScoped<DeleteOrderUseCase>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazor", policy =>
+        policy.WithOrigins("https://localhost:7001", "http://localhost:5001")
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -36,6 +44,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 });
 var app = builder.Build();
+app.UseCors("AllowBlazor");
 
 using (var scope = app.Services.CreateScope())
     scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
