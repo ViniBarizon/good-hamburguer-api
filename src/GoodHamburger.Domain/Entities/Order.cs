@@ -1,3 +1,4 @@
+using GoodHamburger.Domain.Common;
 namespace GoodHamburger.Domain.Entities;
 
 public class Order
