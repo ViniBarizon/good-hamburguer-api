@@ -3,6 +3,8 @@ using GoodHamburger.Domain.Interfaces;
 using GoodHamburger.Infrastructure.Persistence;
 using GoodHamburger.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +22,19 @@ builder.Services.AddScoped<DeleteOrderUseCase>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Good Hamburger API",
+        Version = "v1",
+        Description = "REST API for managing orders at Good Hamburger restaurant."
+    });
 
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+});
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
