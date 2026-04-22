@@ -1,6 +1,7 @@
 using GoodHamburger.Domain.Enums;
+using GoodHamburger.Domain.Entities;
 
-namespace GoodHamburger.Domain.Entities;
+namespace GoodHamburger.Domain.Services;
 
 public static class DiscountCalculator
 {
